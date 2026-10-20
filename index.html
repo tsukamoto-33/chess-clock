@@ -12,12 +12,10 @@
       background: #111827;
       color: #f9fafb;
       font-synthesis: none;
-      text-rendering: optimizeLegibility;
       -webkit-tap-highlight-color: transparent;
     }
 
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-height: 100vh;
@@ -25,30 +23,28 @@
       overflow: hidden;
       background: #111827;
     }
-
-    button, input { font: inherit; }
+    button, input, select { font: inherit; }
 
     .app {
-      width: min(100%, 760px);
+      width: min(100%, 900px);
       height: 100vh;
       height: 100dvh;
       min-height: 320px;
       margin: 0 auto;
-      padding: max(10px, env(safe-area-inset-top)) 16px max(10px, env(safe-area-inset-bottom));
+      padding: max(10px, env(safe-area-inset-top)) 14px max(10px, env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
     }
 
     header {
-      min-height: 42px;
+      min-height: 38px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
-
-    h1 { margin: 0; font-size: 1.1rem; letter-spacing: .03em; }
+    h1 { margin: 0; font-size: 1.1rem; }
     .status { color: #a5b4fc; font-size: .9rem; text-align: right; }
     .status[data-kind="warning"] { color: #fbbf24; }
     .status[data-kind="over"] { color: #fca5a5; }
@@ -57,62 +53,57 @@
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
     .clock {
+      min-width: 0;
       border: 2px solid #374151;
-      border-radius: 22px;
+      border-radius: 20px;
       color: #f9fafb;
       background: #1f2937;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       cursor: pointer;
       touch-action: manipulation;
       user-select: none;
       transition: background .15s, border-color .15s, transform .12s;
     }
-
     .clock:active { transform: scale(.99); }
     .clock.active { border-color: #818cf8; background: #25314a; }
     .clock.running::after {
       content: "● 計測中";
       color: #a5b4fc;
-      font-size: .85rem;
+      font-size: .8rem;
     }
     .clock.expired { border-color: #ef4444; background: #451a1a; }
-    .clock.expired .time { color: #fca5a5; }
+    .clock.expired .time, .clock.expired .sub-time { color: #fca5a5; }
 
-    .player { color: #cbd5e1; font-size: clamp(.95rem, 3vw, 1.2rem); }
-    .time {
+    .player { color: #cbd5e1; font-size: clamp(.85rem, 3vw, 1.1rem); }
+    .time, .sub-time {
       font-variant-numeric: tabular-nums;
-      font-size: clamp(3rem, 15vw, 6.2rem);
+      text-align: center;
+    }
+    .time {
+      font-size: clamp(2.4rem, 12vw, 5.6rem);
       line-height: 1.05;
       font-weight: 750;
-      letter-spacing: .04em;
+      letter-spacing: .02em;
     }
-
-    .match-time {
-      min-height: 34px;
-      text-align: center;
-      color: #cbd5e1;
-      font-variant-numeric: tabular-nums;
-      font-size: .95rem;
-    }
-    .match-time strong { color: #f9fafb; font-size: 1.1rem; }
+    .sub-time { color: #cbd5e1; font-size: clamp(.75rem, 3vw, 1rem); }
+    .sub-time[hidden] { display: none; }
 
     .controls {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 9px;
     }
-
     .controls button, .settings-button, .dialog-actions button {
-      min-height: 48px;
+      min-height: 46px;
       border: 0;
       border-radius: 13px;
       background: #374151;
@@ -121,14 +112,18 @@
       cursor: pointer;
       touch-action: manipulation;
     }
-
-    .controls button.primary { background: #4f46e5; }
+    .controls button.primary, .dialog-actions .save { background: #4f46e5; }
     button:disabled { opacity: .45; cursor: not-allowed; }
-    .settings-button { width: 100%; min-height: 42px; background: transparent; border: 1px solid #4b5563; }
-    .help { margin: 0; text-align: center; color: #9ca3af; font-size: .78rem; }
+    .settings-button {
+      width: 100%;
+      min-height: 40px;
+      background: transparent;
+      border: 1px solid #4b5563;
+    }
+    .help { margin: 0; text-align: center; color: #9ca3af; font-size: .76rem; }
 
     dialog {
-      width: min(92vw, 430px);
+      width: min(92vw, 450px);
       max-height: 90dvh;
       overflow: auto;
       border: 1px solid #4b5563;
@@ -137,48 +132,59 @@
       background: #1f2937;
       color: #f9fafb;
     }
-
     dialog::backdrop { background: rgb(0 0 0 / 68%); }
     dialog h2 { margin: 0 0 16px; font-size: 1.25rem; }
     .field { margin: 14px 0; }
-    .field > label, .field legend { display: block; margin-bottom: 7px; color: #e5e7eb; }
+    .field > label, .field > .field-label {
+      display: block;
+      margin-bottom: 7px;
+      color: #e5e7eb;
+    }
     .time-input { display: flex; align-items: center; gap: 8px; }
     .time-input input {
       width: 50%;
       min-width: 0;
-      height: 46px;
+      height: 42px;
       border: 1px solid #6b7280;
       border-radius: 10px;
       padding: 8px;
       background: #111827;
       color: #fff;
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
     }
-    .checkbox-row { display: flex; align-items: center; gap: 10px; }
-    .checkbox-row input { width: 22px; height: 22px; accent-color: #6366f1; }
+    .check-row { display: flex; align-items: center; gap: 10px; }
+    .check-row input { width: 22px; height: 22px; accent-color: #6366f1; }
+    select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #6b7280;
+      border-radius: 10px;
+      padding: 8px;
+      color: #fff;
+      background: #111827;
+    }
     .dialog-actions { display: flex; gap: 10px; margin-top: 20px; }
     .dialog-actions button { flex: 1; }
-    .dialog-actions .save { background: #4f46e5; }
     .error { min-height: 1.2em; color: #fca5a5; font-size: .88rem; }
 
-    @media (orientation: landscape) and (max-height: 520px) {
-      .app { padding-top: max(5px, env(safe-area-inset-top)); padding-bottom: max(5px, env(safe-area-inset-bottom)); gap: 5px; }
-      header { min-height: 30px; }
-      .clocks { grid-template-rows: 1fr; grid-template-columns: 1fr 1fr; gap: 7px; }
-      .clock { border-radius: 16px; }
-      .time { font-size: clamp(2.3rem, 9vw, 4rem); }
-      .controls button { min-height: 42px; }
-      .help { font-size: .7rem; }
+    @media (max-width: 360px) {
+      .app { padding-left: 8px; padding-right: 8px; gap: 6px; }
+      .clocks { gap: 6px; }
+      .clock { border-radius: 15px; }
+      .time { font-size: clamp(2rem, 11vw, 3rem); }
+      .controls { gap: 6px; }
+      .controls button { min-height: 42px; font-size: .9rem; }
     }
 
-    @media (max-height: 520px) and (orientation: portrait) {
+    @media (max-height: 460px) {
       .app { gap: 5px; }
-      .clock { border-radius: 16px; }
-      .time { font-size: clamp(2.5rem, 12vh, 4rem); }
-      .controls button { min-height: 42px; }
-      .settings-button { min-height: 36px; }
-      .help { font-size: .7rem; }
+      header { min-height: 28px; }
+      .clock { border-radius: 14px; gap: 4px; }
+      .time { font-size: clamp(2rem, 8vw, 3.6rem); }
+      .controls button { min-height: 39px; }
+      .settings-button { min-height: 34px; }
+      .help { font-size: .68rem; }
     }
   </style>
 </head>
@@ -189,18 +195,18 @@
       <div id="status" class="status" aria-live="polite">待機中</div>
     </header>
 
-    <section class="clocks" aria-label="プレイヤーの残り時間">
-      <button class="clock" id="clock0" type="button" aria-label="プレイヤー1の時計を選択">
+    <section class="clocks" aria-label="プレイヤーの時計">
+      <button class="clock" id="clock0" type="button" aria-label="プレイヤー1の時計">
         <span class="player">プレイヤー 1</span>
-        <span class="time" id="time0">05:00</span>
+        <span class="time" id="mainTime0">05:00</span>
+        <span class="sub-time" id="subTime0" hidden>サブ 00:00</span>
       </button>
-      <button class="clock" id="clock1" type="button" aria-label="プレイヤー2の時計を選択">
+      <button class="clock" id="clock1" type="button" aria-label="プレイヤー2の時計">
         <span class="player">プレイヤー 2</span>
-        <span class="time" id="time1">05:00</span>
+        <span class="time" id="mainTime1">05:00</span>
+        <span class="sub-time" id="subTime1" hidden>サブ 00:00</span>
       </button>
     </section>
-
-    <div class="match-time" id="matchTime" aria-live="polite" hidden></div>
 
     <section class="controls" aria-label="対局操作">
       <button class="primary" id="startButton" type="button">開始</button>
@@ -208,49 +214,64 @@
       <button id="resetButton" type="button">リセット</button>
     </section>
 
-    <button class="settings-button" id="settingsButton" type="button">時間設定</button>
-    <p class="help">動いている側の時計をタップすると、手番が切り替わります。</p>
+    <button class="settings-button" id="settingsButton" type="button">時間・表示設定</button>
+    <p class="help">手番を渡すとき、どちらかの時計をタップします。</p>
   </main>
 
   <dialog id="settingsDialog">
     <form id="settingsForm">
-      <h2>時間設定</h2>
+      <h2>時間・表示設定</h2>
 
       <div class="field">
-        <label>プレイヤー 1 の持ち時間</label>
+        <label for="mainMin">各手番のメイン時間</label>
         <div class="time-input">
-          <input id="p1Min" type="number" min="0" max="599" step="1" inputmode="numeric" aria-label="プレイヤー1の分">
+          <input id="mainMin" type="number" min="0" max="599" step="1" inputmode="numeric" aria-label="メイン時間の分">
           <span>分</span>
-          <input id="p1Sec" type="number" min="0" max="59" step="1" inputmode="numeric" aria-label="プレイヤー1の秒">
+          <input id="mainSec" type="number" min="0" max="59" step="1" inputmode="numeric" aria-label="メイン時間の秒">
           <span>秒</span>
         </div>
       </div>
 
       <div class="field">
-        <label>プレイヤー 2 の持ち時間</label>
-        <div class="time-input">
-          <input id="p2Min" type="number" min="0" max="599" step="1" inputmode="numeric" aria-label="プレイヤー2の分">
-          <span>分</span>
-          <input id="p2Sec" type="number" min="0" max="59" step="1" inputmode="numeric" aria-label="プレイヤー2の秒">
-          <span>秒</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="checkbox-row">
-          <input id="matchEnabled" type="checkbox">
-          対局全体の制限時間を使う
+        <label class="check-row">
+          <input id="subEnabled" type="checkbox">
+          サブ時間を使う
         </label>
       </div>
 
-      <div class="field" id="matchFields">
-        <label>対局全体の制限時間</label>
+      <div class="field">
+        <label for="subMode">サブ時間の方式</label>
+        <select id="subMode">
+          <option value="down">カウントダウン（設定時間から減る）</option>
+          <option value="up">カウントアップ（0から目標まで増える）</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>プレイヤー 1 のサブ時間</label>
         <div class="time-input">
-          <input id="matchMin" type="number" min="0" max="599" step="1" inputmode="numeric" aria-label="全体制限時間の分">
+          <input id="sub1Min" type="number" min="0" max="599" step="1" inputmode="numeric" aria-label="プレイヤー1のサブ時間の分">
           <span>分</span>
-          <input id="matchSec" type="number" min="0" max="59" step="1" inputmode="numeric" aria-label="全体制限時間の秒">
+          <input id="sub1Sec" type="number" min="0" max="59" step="1" inputmode="numeric" aria-label="プレイヤー1のサブ時間の秒">
           <span>秒</span>
         </div>
+      </div>
+
+      <div class="field">
+        <label>プレイヤー 2 のサブ時間</label>
+        <div class="time-input">
+          <input id="sub2Min" type="number" min="0" max="599" step="1" inputmode="numeric" aria-label="プレイヤー2のサブ時間の分">
+          <span>分</span>
+          <input id="sub2Sec" type="number" min="0" max="59" step="1" inputmode="numeric" aria-label="プレイヤー2のサブ時間の秒">
+          <span>秒</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="check-row">
+          <input id="soundEnabled" type="checkbox">
+          手番切り替え時に効果音を鳴らす
+        </label>
       </div>
 
       <p class="error" id="settingsError" aria-live="polite"></p>
@@ -265,43 +286,55 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "simple-chess-clock-settings-v1";
-      const defaults = {
-        players: [300000, 300000],
-        matchEnabled: false,
-        matchMs: 1800000
+      const STORAGE_KEY = "chess-clock-settings-v3";
+      const DEFAULTS = {
+        mainMs: 5 * 60 * 1000,
+        subEnabled: true,
+        subMode: "down",
+        subMs: [30 * 60 * 1000, 30 * 60 * 1000],
+        soundEnabled: true
       };
 
       let settings = loadSettings();
-      let remaining = [...settings.players];
-      let matchRemaining = settings.matchMs;
-      let running = false;
+      let mainRemaining = settings.mainMs;
+      let subValues = initialSubValues();
       let activePlayer = 0;
+      let running = false;
       let ended = false;
       let endReason = "";
       let lastTick = null;
       let tickHandle = null;
       let wakeLock = null;
+      let audioContext = null;
 
       const $ = (id) => document.getElementById(id);
-      const status = $("status");
       const clocks = [$("clock0"), $("clock1")];
-      const timeEls = [$("time0"), $("time1")];
+
+      function isValidDuration(ms) {
+        return Number.isInteger(ms) && ms >= 1000 && ms <= 36000000;
+      }
 
       function loadSettings() {
         try {
-          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-          if (saved && Array.isArray(saved.players) && saved.players.length === 2 &&
-              saved.players.every(validStoredTime) &&
-              typeof saved.matchEnabled === "boolean" && validStoredTime(saved.matchMs)) {
-            return saved;
+          const value = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (value &&
+              isValidDuration(value.mainMs) &&
+              typeof value.subEnabled === "boolean" &&
+              (value.subMode === "down" || value.subMode === "up") &&
+              Array.isArray(value.subMs) &&
+              value.subMs.length === 2 &&
+              value.subMs.every(isValidDuration) &&
+              typeof value.soundEnabled === "boolean") {
+            return value;
           }
-        } catch (_) { /* 저장 데이터가 없거나 손상된 경우 기본 설정 사용 */ }
-        return structuredClone(defaults);
+        } catch (_) {
+          /* 保存データがない、または破損している場合は初期設定 */
+        }
+        return { ...DEFAULTS, subMs: [...DEFAULTS.subMs] };
       }
 
-      function validStoredTime(value) {
-        return Number.isFinite(value) && value >= 1000 && value <= 36000000;
+      function initialSubValues() {
+        return settings.subMode === "down" ? [...settings.subMs] : [0, 0];
       }
 
       function formatTime(ms) {
@@ -311,34 +344,53 @@
           String(seconds % 60).padStart(2, "0");
       }
 
-      function render() {
-        timeEls.forEach((el, i) => { el.textContent = formatTime(remaining[i]); });
-        clocks.forEach((el, i) => {
-          el.classList.toggle("active", i === activePlayer && !ended);
-          el.classList.toggle("running", running && i === activePlayer);
-          el.classList.toggle("expired", endReason === "player" && i === activePlayer);
-        });
+      function formatElapsed(ms) {
+        const seconds = Math.floor(Math.max(0, ms) / 1000);
+        const minutes = Math.floor(seconds / 60);
+        return String(minutes).padStart(2, "0") + ":" +
+          String(seconds % 60).padStart(2, "0");
+      }
 
-        if (settings.matchEnabled) {
-          $("matchTime").hidden = false;
-          $("matchTime").innerHTML = "対局全体の残り時間：<strong>" + formatTime(matchRemaining) + "</strong>";
-        } else {
-          $("matchTime").hidden = true;
+      function render() {
+        $("mainTime0").textContent = formatTime(mainRemaining);
+        $("mainTime1").textContent = formatTime(mainRemaining);
+
+        for (let i = 0; i < 2; i++) {
+          const sub = $("subTime" + i);
+          sub.hidden = !settings.subEnabled;
+          if (settings.subMode === "down") {
+            sub.textContent = "サブ残り " + formatTime(subValues[i]);
+          } else {
+            sub.textContent = "サブ経過 " + formatElapsed(subValues[i]);
+          }
         }
 
+        clocks.forEach((clock, index) => {
+          clock.classList.toggle("active", index === activePlayer && !ended);
+          clock.classList.toggle("running", running && index === activePlayer);
+          clock.classList.toggle("expired", ended && index === activePlayer);
+        });
+
+        const status = $("status");
         status.dataset.kind = ended ? "over" : running ? "warning" : "";
         if (ended) {
-          status.textContent = endReason === "match" ? "対局終了：全体時間切れ"
-            : "対局終了：プレイヤー " + (activePlayer + 1) + " の時間切れ";
+          status.textContent = endReason === "sub"
+            ? "対局終了：プレイヤー " + (activePlayer + 1) + " のサブ時間切れ"
+            : "対局終了：プレイヤー " + (activePlayer + 1) + " のメイン時間切れ";
         } else if (running) {
           status.textContent = "対局中 — プレイヤー " + (activePlayer + 1) + " の手番";
         } else {
-          status.textContent = remaining.some((v, i) => v !== settings.players[i]) ||
-            (settings.matchEnabled && matchRemaining !== settings.matchMs) ? "一時停止中" : "待機中";
+          const hasProgress = mainRemaining !== settings.mainMs ||
+            (settings.subMode === "down"
+              ? subValues.some((v, i) => v !== settings.subMs[i])
+              : subValues.some((v) => v > 0));
+          status.textContent = hasProgress ? "一時停止中" : "待機中";
         }
+
         $("startButton").disabled = running || ended;
-        $("startButton").textContent = remaining.some((v, i) => v !== settings.players[i]) ? "再開" : "開始";
+        $("startButton").textContent = $("status").textContent === "待機中" ? "開始" : "再開";
         $("pauseButton").disabled = !running;
+        $("settingsButton").disabled = running;
       }
 
       function finish(reason) {
@@ -354,16 +406,40 @@
 
       function updateClock() {
         if (!running || lastTick === null) return;
+
         const now = Date.now();
         const elapsed = Math.max(0, now - lastTick);
         lastTick = now;
 
-        remaining[activePlayer] = Math.max(0, remaining[activePlayer] - elapsed);
-        if (settings.matchEnabled) matchRemaining = Math.max(0, matchRemaining - elapsed);
+        mainRemaining = Math.max(0, mainRemaining - elapsed);
 
-        if (settings.matchEnabled && matchRemaining <= 0) finish("match");
-        else if (remaining[activePlayer] <= 0) finish("player");
-        else render();
+        if (settings.subEnabled) {
+          if (settings.subMode === "down") {
+            subValues[activePlayer] = Math.max(0, subValues[activePlayer] - elapsed);
+          } else {
+            subValues[activePlayer] += elapsed;
+          }
+        }
+
+        if (mainRemaining <= 0) {
+          finish("main");
+          return;
+        }
+
+        if (settings.subEnabled && settings.subMode === "down" &&
+            subValues[activePlayer] <= 0) {
+          finish("sub");
+          return;
+        }
+
+        if (settings.subEnabled && settings.subMode === "up" &&
+            subValues[activePlayer] >= settings.subMs[activePlayer]) {
+          subValues[activePlayer] = settings.subMs[activePlayer];
+          finish("sub");
+          return;
+        }
+
+        render();
       }
 
       function start() {
@@ -378,7 +454,7 @@
       function pause() {
         if (!running) return;
         updateClock();
-        if (!ended) {
+        if (running) {
           running = false;
           lastTick = null;
           clearInterval(tickHandle);
@@ -388,22 +464,26 @@
         }
       }
 
-      function selectPlayer(index) {
-        if (ended || !running || index === activePlayer) return;
+      function switchPlayer(index) {
+        if (!running || ended || index === activePlayer) return;
+
         updateClock();
         if (ended) return;
+
         activePlayer = index;
+        mainRemaining = settings.mainMs;
         lastTick = Date.now();
+        playSwitchSound();
         render();
       }
 
       function reset() {
-        remaining = [...settings.players];
-        matchRemaining = settings.matchMs;
-        activePlayer = 0;
         running = false;
         ended = false;
         endReason = "";
+        mainRemaining = settings.mainMs;
+        subValues = initialSubValues();
+        activePlayer = 0;
         lastTick = null;
         clearInterval(tickHandle);
         tickHandle = null;
@@ -412,14 +492,13 @@
       }
 
       function requestWakeLock() {
-        if ("wakeLock" in navigator) {
-          navigator.wakeLock.request("screen")
-            .then((lock) => {
-              wakeLock = lock;
-              lock.addEventListener("release", () => { wakeLock = null; });
-            })
-            .catch(() => { /* 非対応・拒否時も時計は継続 */ });
-        }
+        if (!("wakeLock" in navigator)) return;
+        navigator.wakeLock.request("screen").then((lock) => {
+          wakeLock = lock;
+          lock.addEventListener("release", () => { wakeLock = null; });
+        }).catch(() => {
+          /* 非対応・許可拒否時も時計は動作 */
+        });
       }
 
       function releaseWakeLock() {
@@ -429,63 +508,114 @@
         }
       }
 
+      function playSwitchSound() {
+        if (!settings.soundEnabled) return;
+
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+
+          if (!audioContext) audioContext = new AudioContextClass();
+          if (audioContext.state === "suspended") {
+            audioContext.resume().catch(() => {});
+          }
+
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          const now = audioContext.currentTime;
+
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(880, now);
+          oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.09);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(now);
+          oscillator.stop(now + 0.14);
+        } catch (_) {
+          /* 音声非対応・再生拒否の場合は無音で動作 */
+        }
+      }
+
       function openSettings() {
         if (running) return;
-        $("p1Min").value = Math.floor(settings.players[0] / 60000);
-        $("p1Sec").value = Math.floor(settings.players[0] / 1000) % 60;
-        $("p2Min").value = Math.floor(settings.players[1] / 60000);
-        $("p2Sec").value = Math.floor(settings.players[1] / 1000) % 60;
-        $("matchMin").value = Math.floor(settings.matchMs / 60000);
-        $("matchSec").value = Math.floor(settings.matchMs / 1000) % 60;
-        $("matchEnabled").checked = settings.matchEnabled;
-        $("matchFields").style.opacity = settings.matchEnabled ? "1" : ".45";
+
+        $("mainMin").value = Math.floor(settings.mainMs / 60000);
+        $("mainSec").value = Math.floor(settings.mainMs / 1000) % 60;
+
+        [0, 1].forEach((i) => {
+          $("sub" + (i + 1) + "Min").value = Math.floor(settings.subMs[i] / 60000);
+          $("sub" + (i + 1) + "Sec").value = Math.floor(settings.subMs[i] / 1000) % 60;
+        });
+
+        $("subEnabled").checked = settings.subEnabled;
+        $("subMode").value = settings.subMode;
+        $("soundEnabled").checked = settings.soundEnabled;
         $("settingsError").textContent = "";
         $("settingsDialog").showModal();
       }
 
       function readDuration(minId, secId) {
-        const minInput = $(minId);
-        const secInput = $(secId);
-        if (minInput.value.trim() === "" || secInput.value.trim() === "") return null;
-        const min = Number(minInput.value);
-        const sec = Number(secInput.value);
-        if (!Number.isInteger(min) || min < 0 || min > 599 ||
-            !Number.isInteger(sec) || sec < 0 || sec > 59) return null;
-        const ms = (min * 60 + sec) * 1000;
-        return ms >= 1000 ? ms : null;
+        const minText = $(minId).value.trim();
+        const secText = $(secId).value.trim();
+        if (minText === "" || secText === "") return null;
+
+        const minutes = Number(minText);
+        const seconds = Number(secText);
+
+        if (!Number.isInteger(minutes) || minutes < 0 || minutes > 599 ||
+            !Number.isInteger(seconds) || seconds < 0 || seconds > 59) {
+          return null;
+        }
+
+        const ms = (minutes * 60 + seconds) * 1000;
+        return isValidDuration(ms) ? ms : null;
       }
 
-      clocks.forEach((clock, i) => clock.addEventListener("click", () => selectPlayer(i)));
+      clocks.forEach((clock, index) => {
+        clock.addEventListener("click", () => switchPlayer(index));
+      });
+
       $("startButton").addEventListener("click", start);
       $("pauseButton").addEventListener("click", pause);
-      $("resetButton").addEventListener("click", () => {
-        if (running && !window.confirm("対局中です。リセットしてよろしいですか？")) return;
-        reset();
-      });
       $("settingsButton").addEventListener("click", openSettings);
       $("cancelSettings").addEventListener("click", () => $("settingsDialog").close());
-      $("matchEnabled").addEventListener("change", () => {
-        $("matchFields").style.opacity = $("matchEnabled").checked ? "1" : ".45";
+
+      $("resetButton").addEventListener("click", () => {
+        if (running && !window.confirm("対局中です。時間をリセットしてよろしいですか？")) return;
+        reset();
       });
 
       $("settingsForm").addEventListener("submit", (event) => {
         event.preventDefault();
-        const p1 = readDuration("p1Min", "p1Sec");
-        const p2 = readDuration("p2Min", "p2Sec");
-        const match = readDuration("matchMin", "matchSec");
-        const enabled = $("matchEnabled").checked;
 
-        if (p1 === null || p2 === null || (enabled && match === null)) {
-          $("settingsError").textContent = "各時間は1秒以上、分は0〜599、秒は0〜59で入力してください。";
+        const mainMs = readDuration("mainMin", "mainSec");
+        const sub1 = readDuration("sub1Min", "sub1Sec");
+        const sub2 = readDuration("sub2Min", "sub2Sec");
+
+        if (mainMs === null || sub1 === null || sub2 === null) {
+          $("settingsError").textContent =
+            "各時間は1秒以上、分は0〜599、秒は0〜59で入力してください。";
           return;
         }
 
         settings = {
-          players: [p1, p2],
-          matchEnabled: enabled,
-          matchMs: match === null ? settings.matchMs : match
+          mainMs,
+          subEnabled: $("subEnabled").checked,
+          subMode: $("subMode").value,
+          subMs: [sub1, sub2],
+          soundEnabled: $("soundEnabled").checked
         };
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch (_) {}
+
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (_) {
+          /* ストレージが使えなくても、このページ上では設定を使用 */
+        }
+
         $("settingsDialog").close();
         reset();
       });
