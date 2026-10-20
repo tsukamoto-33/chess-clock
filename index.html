@@ -290,7 +290,7 @@
     </section>
 
     <button class="settings-button" id="settingsButton" type="button">時間・表示設定</button>
-    <p class="help">手番を渡すとき、どちらかの時計をタップします。</p>
+    <p class="help">対局中は、左右どちらの時計をタップしても手番が切り替わります。</p>
   </main>
 
   <dialog id="settingsDialog">
@@ -435,8 +435,7 @@
       }
 
       function render() {
-        // 選択中のプレイヤーだけ残り時間を減らして表示する。
-        // 非選択側には、次の手番で使う設定時間を表示する。
+        // 手番側だけ残り時間を表示し、相手側には設定時間を表示する。
         $("mainTime0").textContent = formatTime(
           activePlayer === 0 ? mainRemaining : settings.mainMs
         );
@@ -538,7 +537,6 @@
           }
         }
 
-        // メイン時計が残り5秒以下になった時点で、この手番につき一度振動する。
         if (!vibrationWarned &&
             previousMainRemaining > 5000 &&
             mainRemaining <= 5000 &&
@@ -576,7 +574,6 @@
         running = true;
         lastTick = Date.now();
 
-        // 残り5秒以下の状態から開始・再開した場合も振動する。
         if (mainRemaining <= 5000 &&
             mainRemaining > 0 &&
             !vibrationWarned) {
@@ -606,13 +603,14 @@
         }
       }
 
-      function switchPlayer(index) {
-        if (!running || ended || index === activePlayer) return;
+      // どちら側をタップしても、現在の手番から相手側へ切り替える。
+      function switchPlayer() {
+        if (!running || ended) return;
 
         updateClock();
         if (ended) return;
 
-        activePlayer = index;
+        activePlayer = 1 - activePlayer;
         mainRemaining = settings.mainMs;
         lastTick = Date.now();
 
@@ -735,8 +733,9 @@
         return isValidDuration(duration) ? duration : null;
       }
 
-      clocks.forEach((clock, index) => {
-        clock.addEventListener("click", () => switchPlayer(index));
+      // どちらの時計をタップしても、同じ手番切り替え処理を呼び出す。
+      clocks.forEach((clock) => {
+        clock.addEventListener("click", switchPlayer);
       });
 
       $("startButton").addEventListener("click", start);
