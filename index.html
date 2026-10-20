@@ -48,7 +48,13 @@
     }
 
     h1 { margin: 0; font-size: 1.1rem; }
-    .status { color: #a5b4fc; font-size: .9rem; text-align: right; }
+
+    .status {
+      color: #a5b4fc;
+      font-size: .9rem;
+      text-align: right;
+    }
+
     .status[data-kind="warning"] { color: #fbbf24; }
     .status[data-kind="over"] { color: #fca5a5; }
 
@@ -86,10 +92,20 @@
       font-size: .8rem;
     }
 
-    .clock.expired { border-color: #ef4444; background: #451a1a; }
-    .clock.expired .time, .clock.expired .sub-time { color: #fca5a5; }
+    .clock.expired {
+      border-color: #ef4444;
+      background: #451a1a;
+    }
 
-    .player { color: #cbd5e1; font-size: clamp(.85rem, 3vw, 1.1rem); }
+    .clock.expired .time,
+    .clock.expired .sub-time {
+      color: #fca5a5;
+    }
+
+    .player {
+      color: #cbd5e1;
+      font-size: clamp(.85rem, 3vw, 1.1rem);
+    }
 
     .time, .sub-time {
       font-variant-numeric: tabular-nums;
@@ -116,7 +132,9 @@
       gap: 9px;
     }
 
-    .controls button, .settings-button, .dialog-actions button {
+    .controls button,
+    .settings-button,
+    .dialog-actions button {
       min-height: 46px;
       border: 0;
       border-radius: 13px;
@@ -127,8 +145,15 @@
       touch-action: manipulation;
     }
 
-    .controls button.primary, .dialog-actions .save { background: #4f46e5; }
-    button:disabled { opacity: .45; cursor: not-allowed; }
+    .controls button.primary,
+    .dialog-actions .save {
+      background: #4f46e5;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
 
     .settings-button {
       width: 100%;
@@ -157,15 +182,21 @@
 
     dialog::backdrop { background: rgb(0 0 0 / 68%); }
     dialog h2 { margin: 0 0 16px; font-size: 1.25rem; }
+
     .field { margin: 14px 0; }
 
-    .field > label, .field > .field-label {
+    .field > label,
+    .field > .field-label {
       display: block;
       margin-bottom: 7px;
       color: #e5e7eb;
     }
 
-    .time-input { display: flex; align-items: center; gap: 8px; }
+    .time-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     .time-input input {
       width: 50%;
@@ -180,8 +211,17 @@
       font-size: 1.05rem;
     }
 
-    .check-row { display: flex; align-items: center; gap: 10px; }
-    .check-row input { width: 22px; height: 22px; accent-color: #6366f1; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .check-row input {
+      width: 22px;
+      height: 22px;
+      accent-color: #6366f1;
+    }
 
     select {
       width: 100%;
@@ -193,7 +233,12 @@
       background: #111827;
     }
 
-    .dialog-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .dialog-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
     .dialog-actions button { flex: 1; }
     .error { min-height: 1.2em; color: #fca5a5; font-size: .88rem; }
 
@@ -230,6 +275,7 @@
         <span class="time" id="mainTime0">05:00</span>
         <span class="sub-time" id="subTime0" hidden>サブ 00:00</span>
       </button>
+
       <button class="clock" id="clock1" type="button" aria-label="プレイヤー2の時計">
         <span class="player">プレイヤー 2</span>
         <span class="time" id="mainTime1">05:00</span>
@@ -304,6 +350,7 @@
       </div>
 
       <p class="error" id="settingsError" aria-live="polite"></p>
+
       <div class="dialog-actions">
         <button type="button" id="cancelSettings">キャンセル</button>
         <button type="submit" class="save">保存</button>
@@ -347,6 +394,7 @@
       function loadSettings() {
         try {
           const value = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
           if (value &&
               isValidDuration(value.mainMs) &&
               typeof value.subEnabled === "boolean" &&
@@ -358,18 +406,22 @@
             return value;
           }
         } catch (_) {
-          /* 保存データがない、または破損している場合は初期設定 */
+          /* 設定データがない、または破損している場合は初期設定を使う */
         }
+
         return { ...DEFAULTS, subMs: [...DEFAULTS.subMs] };
       }
 
       function initialSubValues() {
-        return settings.subMode === "down" ? [...settings.subMs] : [0, 0];
+        return settings.subMode === "down"
+          ? [...settings.subMs]
+          : [0, 0];
       }
 
       function formatTime(ms) {
         const seconds = Math.ceil(Math.max(0, ms) / 1000);
         const minutes = Math.floor(seconds / 60);
+
         return String(minutes).padStart(2, "0") + ":" +
           String(seconds % 60).padStart(2, "0");
       }
@@ -377,20 +429,30 @@
       function formatElapsed(ms) {
         const seconds = Math.floor(Math.max(0, ms) / 1000);
         const minutes = Math.floor(seconds / 60);
+
         return String(minutes).padStart(2, "0") + ":" +
           String(seconds % 60).padStart(2, "0");
       }
 
       function render() {
-        $("mainTime0").textContent = formatTime(mainRemaining);
-        $("mainTime1").textContent = formatTime(mainRemaining);
+        // 選択中のプレイヤーだけ残り時間を減らして表示する。
+        // 非選択側には、次の手番で使う設定時間を表示する。
+        $("mainTime0").textContent = formatTime(
+          activePlayer === 0 ? mainRemaining : settings.mainMs
+        );
+        $("mainTime1").textContent = formatTime(
+          activePlayer === 1 ? mainRemaining : settings.mainMs
+        );
 
         for (let i = 0; i < 2; i++) {
           const sub = $("subTime" + i);
           sub.hidden = !settings.subEnabled;
-          sub.textContent = settings.subMode === "down"
-            ? "サブ残り " + formatTime(subValues[i])
-            : "サブ経過 " + formatElapsed(subValues[i]);
+
+          if (settings.subMode === "down") {
+            sub.textContent = "サブ残り " + formatTime(subValues[i]);
+          } else {
+            sub.textContent = "サブ経過 " + formatElapsed(subValues[i]);
+          }
         }
 
         clocks.forEach((clock, index) => {
@@ -449,6 +511,7 @@
         ended = true;
         endReason = reason;
         lastTick = null;
+
         clearInterval(tickHandle);
         tickHandle = null;
         stopVibration();
@@ -475,7 +538,7 @@
           }
         }
 
-        // 残り5秒を初めて下回ったときに、この手番で一度だけ振動する
+        // メイン時計が残り5秒以下になった時点で、この手番につき一度振動する。
         if (!vibrationWarned &&
             previousMainRemaining > 5000 &&
             mainRemaining <= 5000 &&
@@ -513,7 +576,7 @@
         running = true;
         lastTick = Date.now();
 
-        // 5秒以下の時間で開始・再開した場合も通知する
+        // 残り5秒以下の状態から開始・再開した場合も振動する。
         if (mainRemaining <= 5000 &&
             mainRemaining > 0 &&
             !vibrationWarned) {
@@ -534,6 +597,7 @@
         if (running) {
           running = false;
           lastTick = null;
+
           clearInterval(tickHandle);
           tickHandle = null;
           stopVibration();
@@ -581,27 +645,32 @@
 
         navigator.wakeLock.request("screen").then((lock) => {
           wakeLock = lock;
-          lock.addEventListener("release", () => { wakeLock = null; });
+          lock.addEventListener("release", () => {
+            wakeLock = null;
+          });
         }).catch(() => {
-          /* 非対応・許可拒否時も時計は動作 */
+          /* 非対応・許可拒否時も時計は動作する */
         });
       }
 
       function releaseWakeLock() {
-        if (wakeLock) {
-          wakeLock.release().catch(() => {});
-          wakeLock = null;
-        }
+        if (!wakeLock) return;
+
+        wakeLock.release().catch(() => {});
+        wakeLock = null;
       }
 
       function playSwitchSound() {
         if (!settings.soundEnabled) return;
 
         try {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          const AudioContextClass =
+            window.AudioContext || window.webkitAudioContext;
+
           if (!AudioContextClass) return;
 
           if (!audioContext) audioContext = new AudioContextClass();
+
           if (audioContext.state === "suspended") {
             audioContext.resume().catch(() => {});
           }
@@ -613,6 +682,7 @@
           oscillator.type = "sine";
           oscillator.frequency.setValueAtTime(880, now);
           oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.09);
+
           gain.gain.setValueAtTime(0.0001, now);
           gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
@@ -622,7 +692,7 @@
           oscillator.start(now);
           oscillator.stop(now + 0.14);
         } catch (_) {
-          /* 音声非対応・再生拒否の場合は無音で動作 */
+          /* 音声非対応・再生拒否の場合は無音で動作する */
         }
       }
 
@@ -633,9 +703,10 @@
         $("mainSec").value = Math.floor(settings.mainMs / 1000) % 60;
 
         [0, 1].forEach((index) => {
-          $("sub" + (index + 1) + "Min").value =
+          const player = index + 1;
+          $("sub" + player + "Min").value =
             Math.floor(settings.subMs[index] / 60000);
-          $("sub" + (index + 1) + "Sec").value =
+          $("sub" + player + "Sec").value =
             Math.floor(settings.subMs[index] / 1000) % 60;
         });
 
@@ -671,6 +742,7 @@
       $("startButton").addEventListener("click", start);
       $("pauseButton").addEventListener("click", pause);
       $("settingsButton").addEventListener("click", openSettings);
+
       $("cancelSettings").addEventListener("click", () => {
         $("settingsDialog").close();
       });
@@ -680,6 +752,7 @@
             !window.confirm("対局中です。時間をリセットしてよろしいですか？")) {
           return;
         }
+
         reset();
       });
 
@@ -707,7 +780,7 @@
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
         } catch (_) {
-          /* ストレージが使えなくても、このページ上では設定を使用 */
+          /* 保存できなくても、このページ上では新しい設定を使用する */
         }
 
         $("settingsDialog").close();
