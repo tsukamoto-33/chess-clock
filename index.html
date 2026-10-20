@@ -343,6 +343,12 @@
       </div>
 
       <div class="field">
+        <label for="vibrationSeconds">メイン時計のバイブ通知開始時間（秒）</label>
+        <input id="vibrationSeconds" type="number" min="1" max="60" step="1" inputmode="numeric" aria-label="バイブ通知を始める残り秒数">
+        <small>設定した残り秒数以下になると、5秒間振動します。</small>
+      </div>
+
+      <div class="field">
         <label class="check-row">
           <input id="soundEnabled" type="checkbox">
           手番切り替え時に効果音を鳴らす
@@ -362,12 +368,13 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "chess-clock-settings-v3";
+      const STORAGE_KEY = "chess-clock-settings-v4";
       const DEFAULTS = {
         mainMs: 5 * 60 * 1000,
         subEnabled: true,
         subMode: "down",
         subMs: [30 * 60 * 1000, 30 * 60 * 1000],
+        vibrationSeconds: 5,
         soundEnabled: true
       };
 
@@ -391,6 +398,10 @@
         return Number.isInteger(ms) && ms >= 1000 && ms <= 36000000;
       }
 
+      function isValidVibrationSeconds(value) {
+        return Number.isInteger(value) && value >= 1 && value <= 60;
+      }
+
       function loadSettings() {
         try {
           const value = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -402,7 +413,8 @@
               Array.isArray(value.subMs) &&
               value.subMs.length === 2 &&
               value.subMs.every(isValidDuration) &&
-              typeof value.soundEnabled === "boolean") {
+              typeof value.soundEnabled === "boolean" &&
+              isValidVibrationSeconds(value.vibrationSeconds)) {
             return value;
           }
         } catch (_) {
@@ -537,9 +549,12 @@
           }
         }
 
+        const vibrationThreshold = settings.vibrationSeconds * 1000;
+
+        // 設定した残り時間以下になったとき、この手番で一度だけ通知する。
         if (!vibrationWarned &&
-            previousMainRemaining > 5000 &&
-            mainRemaining <= 5000 &&
+            previousMainRemaining > vibrationThreshold &&
+            mainRemaining <= vibrationThreshold &&
             mainRemaining > 0) {
           vibrationWarned = true;
           vibrateWarning();
@@ -574,7 +589,10 @@
         running = true;
         lastTick = Date.now();
 
-        if (mainRemaining <= 5000 &&
+        const vibrationThreshold = settings.vibrationSeconds * 1000;
+
+        // 設定した通知時間以下の状態から開始・再開した場合も振動する。
+        if (mainRemaining <= vibrationThreshold &&
             mainRemaining > 0 &&
             !vibrationWarned) {
           vibrationWarned = true;
@@ -710,6 +728,7 @@
 
         $("subEnabled").checked = settings.subEnabled;
         $("subMode").value = settings.subMode;
+        $("vibrationSeconds").value = settings.vibrationSeconds;
         $("soundEnabled").checked = settings.soundEnabled;
         $("settingsError").textContent = "";
         $("settingsDialog").showModal();
@@ -733,7 +752,6 @@
         return isValidDuration(duration) ? duration : null;
       }
 
-      // どちらの時計をタップしても、同じ手番切り替え処理を呼び出す。
       clocks.forEach((clock) => {
         clock.addEventListener("click", switchPlayer);
       });
@@ -761,10 +779,17 @@
         const mainMs = readDuration("mainMin", "mainSec");
         const sub1 = readDuration("sub1Min", "sub1Sec");
         const sub2 = readDuration("sub2Min", "sub2Sec");
+        const vibrationSeconds = Number($("vibrationSeconds").value);
 
         if (mainMs === null || sub1 === null || sub2 === null) {
           $("settingsError").textContent =
             "各時間は1秒以上、分は0〜599、秒は0〜59で入力してください。";
+          return;
+        }
+
+        if (!isValidVibrationSeconds(vibrationSeconds)) {
+          $("settingsError").textContent =
+            "バイブ通知の開始時間は1〜60秒の整数で入力してください。";
           return;
         }
 
@@ -773,6 +798,7 @@
           subEnabled: $("subEnabled").checked,
           subMode: $("subMode").value,
           subMs: [sub1, sub2],
+          vibrationSeconds,
           soundEnabled: $("soundEnabled").checked
         };
 
